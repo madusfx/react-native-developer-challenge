@@ -63,7 +63,6 @@ export const MoonButton = styled(Entypo)`
 `;
 
 export const Card = styled.TouchableOpacity`
-  margin: 12px;
   width: 45%;
   border-radius: 24px;
   overflow: hidden;
@@ -82,7 +81,7 @@ export const CardTitle = styled.Text`
   background-color: ${({ theme }) => theme.cardColor};
   color: ${({ theme }) => theme.cardTitle};
   border-radius: 6px;
-  width: 40%;
+  width: 70%;
   bottom: 60px;
 `;
 

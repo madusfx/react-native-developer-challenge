@@ -8,7 +8,7 @@ const GradientOverlay = ({ ...props }) => {
   return (
     <S.GradientOverlay
       colors={['transparent', theme.gradientColor]}
-      locations={[0.1, 0.5]}
+      locations={[0.1, 0.8]}
       {...props}
     />
   );

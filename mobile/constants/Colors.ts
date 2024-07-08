@@ -13,6 +13,8 @@ export const Colors = {
     filterBackground: '#d3d3d3',
     gradientColor: '#fff',
     cardTitle: '#000',
+    backgroundClassification: '#000',
+    classificationText: '#fff',
   },
   dark: {
     text: '#ECEDEE',
@@ -23,5 +25,7 @@ export const Colors = {
     filterBackground: '#d3d3d3',
     gradientColor: '#141516',
     cardTitle: '#fff',
+    backgroundClassification: '#fff',
+    classificationText: '#000',
   },
 };

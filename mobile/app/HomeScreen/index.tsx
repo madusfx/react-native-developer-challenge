@@ -1,47 +1,71 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { FlatList, TouchableOpacity } from 'react-native';
 import { ThemeProvider } from 'styled-components';
 import { Colors } from '@/constants/Colors';
-
-import * as S from './styles';
 import { NavigationProp, useNavigation } from '@react-navigation/native';
 import { RootStackParamList } from '../navigation';
 import GradientOverlay from '@/components/GradientOverlay';
 import { CustomTextInput } from '@/components/TextInput';
+import api from '@/utils/api';
+
+import * as S from './styles';
 
 const lightTheme = Colors.light;
 const darkTheme = Colors.dark;
 
-const cardsData = [
-  {
-    id: '1',
-    title: 'Título',
-    description:
-      'Descrição Descrição Descrição Descrição Descrição Descrição Descrição Descrição Descrição Descrição Descrição',
-  },
-  { id: '2', title: 'Título', description: 'Descrição' },
-  { id: '3', title: 'Título', description: 'Descrição' },
-  { id: '4', title: 'Título', description: 'Descrição' },
-  { id: '5', title: 'Título', description: 'Descrição' },
-  { id: '6', title: 'Título', description: 'Descrição' },
-  { id: '7', title: 'Título', description: 'Descrição' },
-  { id: '8', title: 'Título', description: 'Descrição' },
-  { id: '9', title: 'Título', description: 'Descrição' },
-  { id: '10', title: 'Título', description: 'Descrição' },
-  { id: '11', title: 'Título', description: 'Descrição' },
-  { id: '12', title: 'Título', description: 'Descrição' },
-];
+type MovieProps = {
+  adult: boolean;
+  backdrop_path: string;
+  genre_ids: Array<number>;
+  id: number;
+  original_language: string;
+  original_title: string;
+  overview: string;
+  popularity: number;
+  poster_path: string;
+  release_date: Date;
+  title: string;
+  video: boolean;
+  vote_average: number;
+  vote_count: number;
+};
 
 export default function HomeScreen() {
   const [isDarkTheme, setIsDarkTheme] = useState(false);
+  const [movies, setMovies] = useState<MovieProps[]>([]);
+  const [filteredMovies, setFilteredMovies] = useState<MovieProps[]>([]);
+  const [filterText, setFilterText] = useState('');
+  const imagePath = 'https://image.tmdb.org/t/p/w500';
   const navigation = useNavigation<NavigationProp<RootStackParamList>>();
+
+  useEffect(() => {
+    async function fetchData() {
+      try {
+        const response = await api.get('');
+        setMovies(response.data.results);
+      } catch (error) {
+        console.log(error);
+      }
+    }
+    fetchData();
+  }, []);
+
+  useEffect(() => {
+    const filtered = movies.filter(movie =>
+      movie.title.toLowerCase().includes(filterText.toLowerCase()),
+    );
+    setFilteredMovies(filtered);
+  }, [filterText, movies]);
 
   return (
     <ThemeProvider theme={isDarkTheme ? darkTheme : lightTheme}>
       <S.View>
         <S.HeaderContainer>
           <S.FilterContainer>
-            <CustomTextInput placeholder="Filtrar..." />
+            <CustomTextInput
+              placeholder="Filtrar..."
+              onChangeText={setFilterText}
+            />
             <S.SearchIcon name="search1" size={18} />
           </S.FilterContainer>
           <S.Container>
@@ -57,19 +81,33 @@ export default function HomeScreen() {
           </S.Container>
         </S.HeaderContainer>
         <FlatList
-          data={cardsData}
+          data={filteredMovies}
           renderItem={({ item }) => (
-            <S.Card onPress={() => navigation.navigate('InformationsScreen')}>
-              <S.ImageCard source={require('../../assets/images/image.jpg')}>
+            <S.Card
+              onPress={() =>
+                navigation.navigate('InformationsScreen', {
+                  movie: item,
+                  isDarkTheme,
+                })
+              }
+            >
+              <S.ImageCard
+                source={
+                  item.poster_path
+                    ? { uri: `${imagePath}${item.poster_path}` }
+                    : undefined
+                }
+              >
                 <GradientOverlay />
                 <S.CardTitle>{item.title}</S.CardTitle>
-                <S.DescriptionCard>{item.description}</S.DescriptionCard>
+                <S.DescriptionCard>{item.overview}</S.DescriptionCard>
               </S.ImageCard>
             </S.Card>
           )}
-          keyExtractor={item => item.id}
+          keyExtractor={item => item.id.toString()}
           numColumns={2}
-          contentContainerStyle={{ paddingBottom: 16 }}
+          contentContainerStyle={{ padding: 12, gap: 26 }}
+          columnWrapperStyle={{ gap: 26 }}
         />
       </S.View>
     </ThemeProvider>
